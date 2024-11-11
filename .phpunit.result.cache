@@ -1,0 +1,1 @@
+{"version":1,"defects":{"ObtenerProductosTest::testObtenerProductos":5,"SentryTest::testCapturaDeError":5},"times":{"ObtenerProductosTest::testObtenerProductos":0.011,"SentryTest::testCapturaDeError":0.54}}

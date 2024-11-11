@@ -1,4 +1,5 @@
 <?php
+
 header('Content-Type: application/json');
 require_once 'conexion.php';
 
@@ -11,8 +12,13 @@ function obtenerProductos() {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $productos = obtenerProductos();
-    echo json_encode(['success' => true, 'productos' => $productos]);
+    try {
+        $productos = obtenerProductos();
+        echo json_encode(['success' => true, 'productos' => $productos]);
+    } catch (Exception $e) {
+        \Sentry\captureException($e);
+        echo json_encode(['success' => false, 'mensaje' => 'Error al obtener los productos']);
+    }
 } else {
     echo json_encode(['success' => false, 'mensaje' => 'Método no permitido']);
 }

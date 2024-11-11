@@ -6,7 +6,7 @@ let usuarioActual = null;
 let productos = [];
 
 function renderizarProductos() {
-    fetch('PHP/obtener_productos.php')
+    return fetch('PHP/obtener_productos.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -107,24 +107,6 @@ function cambiarCantidad(id, cambio) {
     }
 }
 
-function renderizarLogin() {
-    const contenido = document.getElementById('contenido');
-    contenido.innerHTML = `
-        <h2>Iniciar Sesión</h2>
-        <form onsubmit="iniciarSesion(event)">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-        </form>
-    `;
-}
-
 function renderizarRegistro() {
     const contenido = document.getElementById('contenido');
     contenido.innerHTML = `
@@ -185,7 +167,12 @@ function realizarCompra() {
         },
         body: JSON.stringify(compra)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert('Compra realizada con éxito');
@@ -237,6 +224,27 @@ function iniciarSesion(event) {
     });
 }
 
+document.getElementById('login-link').addEventListener('click', renderizarLogin);
+
+function renderizarLogin() {
+    const contenido = document.getElementById('contenido');
+    contenido.innerHTML = `
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+        </form>
+    `;
+    document.getElementById('login-form').addEventListener('submit', iniciarSesion);
+}
+
 function registrarse(event) {
     event.preventDefault();
     const nombre = document.getElementById('nombre').value;
@@ -286,7 +294,19 @@ function init() {
 }
 
 // Asegúrate de llamar a init() cuando se carga la página
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', function() {
+    init();
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario) {
+        document.getElementById('login-link').classList.add('d-none');
+        document.getElementById('logout-item').classList.remove('d-none');
+    }
+
+    document.getElementById('logout-link').addEventListener('click', function() {
+        localStorage.removeItem('usuario');
+        window.location.href = 'index.php';
+    });
+});
 
 function agregarNuevoProducto(event) {
     event.preventDefault();
